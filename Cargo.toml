@@ -1,0 +1,9 @@
+[package]
+name = "opticaltracking"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["input", "pre_process", "jcs", "post_process", "plot"]
+
+[dependencies]

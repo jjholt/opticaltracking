@@ -7,7 +7,7 @@ use super::landmark::Position;
 use super::Landmark;
 use super::orientation::*;
 
-enum Side {
+pub enum Side {
     Right,
     Left,
 }
@@ -19,19 +19,19 @@ trait Bone {
     type Body: IsFrameOfReference;
     fn fixed_frame(&self) -> Transform<'_, Global, Self::Body>;
 }
-struct Tibia {
+pub struct Tibia {
     side: Side,
     medial: Landmark<RBTibia, Medial>,
     lateral: Landmark<RBTibia, Lateral>,
     distal: Landmark<RBTibia, Distal>,
 }
-struct Femur {
+pub struct Femur {
     side: Side,
     medial: Landmark<RBFemur, Medial>,
     lateral: Landmark<RBFemur, Lateral>,
     proximal: Landmark<RBFemur, Proximal>,
 }
-struct Patella {
+pub struct Patella {
     side: Side,
     medial: Landmark<RBPatella, Medial>,
     lateral: Landmark<RBPatella, Lateral>,
@@ -61,7 +61,8 @@ impl Femur {
     pub fn in_global(&self) -> gTf {
         self.fixed_frame()
     }
-    pub fn new(side: Side, medial: Landmark<RBFemur, Medial>, lateral: Landmark<RBFemur, Lateral>, proximal: Landmark<RBFemur, Proximal>) -> Self {
+    #[cfg(test)]
+    pub(crate) fn new(side: Side, medial: Landmark<RBFemur, Medial>, lateral: Landmark<RBFemur, Lateral>, proximal: Landmark<RBFemur, Proximal>) -> Self {
         Self {
             side,
             medial,

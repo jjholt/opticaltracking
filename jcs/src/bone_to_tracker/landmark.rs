@@ -29,7 +29,7 @@ pub struct ProbeData {
 }
 
 impl ProbeData {
-    pub fn new( q0: f64, qx: f64, qy: f64, qz: f64, x: f64, y: f64, z: f64) -> ProbeData {
+    pub(crate) fn new( q0: f64, qx: f64, qy: f64, qz: f64, x: f64, y: f64, z: f64) -> ProbeData {
         Self {q0, qx, qy, qz, x, y, z}
     }
 }
@@ -62,7 +62,8 @@ impl<RB: IsFrameOfReference, O: Orientation> Landmark<RB, O> {
     pub fn rotations(&self) -> &na::Quaternion<f64> {
         &self.position.rotation
     }
-    pub fn new(probe_name: &str, probe_label: &str, position: Position) -> Self {
+    #[cfg(test)]
+    pub(crate) fn new(probe_name: &str, probe_label: &str, position: Position) -> Self {
         Self { probe_name: probe_name.to_string(), probe_label: probe_label.to_string(), position, bone: PhantomData, orientation: PhantomData }
     }
 }

@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate approx;
 
-mod transform;
 mod bone_to_tracker;
+mod transform;
 
 use std::marker::PhantomData;
 
@@ -12,9 +12,8 @@ use transform::IsFrameOfReference;
 struct RigidBody<const ID: usize> {}
 impl<const ID: usize> IsFrameOfReference for RigidBody<ID> {}
 
-
 #[derive(Debug)]
-struct Tracker <RB: IsFrameOfReference> (PhantomData<RB>);
+struct Tracker<RB: IsFrameOfReference>(PhantomData<RB>);
 
 impl<RB: IsFrameOfReference> IsFrameOfReference for Tracker<RB> {}
 
@@ -24,8 +23,8 @@ impl IsFrameOfReference for Global {}
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::transform::Transform;
+    use super::*;
     use bone_to_tracker::knee::{RBFemur, RBTibia};
     use nalgebra as na;
     use transform::Mldivide;

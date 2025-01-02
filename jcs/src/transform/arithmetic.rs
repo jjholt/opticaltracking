@@ -2,39 +2,32 @@ use nalgebra as na;
 use std::{marker::PhantomData, ops};
 
 pub trait IsFrameOfReference {}
+
 #[derive(Debug)]
 pub struct Transform<'a, T, V>
 where
     T: IsFrameOfReference,
     V: IsFrameOfReference,
 {
-    // data: &'a[na::Transform3<f64>],
-    data: Vec<na::Transform3<f64>>,
+    data: na::Transform3<f64>,
     _from: PhantomData<&'a T>,
     _to: PhantomData<&'a V>,
 }
+pub trait Mldivide<Rhs> {
+    type Output;
+    fn mldivide(&self, rhs: &Rhs) -> Self::Output;
+}
 
-impl<'b, B, T, V> ops::Mul<Transform<'b, V, B>> for Transform<'_, T, V>
+impl<'b, A, G, B> ops::Mul<Transform<'b, G, B>> for Transform<'_, A, G>
 where
-    T: IsFrameOfReference + 'b,
-    V: IsFrameOfReference,
+    A: IsFrameOfReference + 'b,
+    G: IsFrameOfReference,
     B: IsFrameOfReference,
 {
-    type Output = Transform<'b, T, B>;
+    type Output = Transform<'b, A, B>;
 
-    fn mul(self, rhs: Transform<'b, V, B>) -> Self::Output {
-        if self.data.len() != rhs.data.len() && self.data.len() != 1 {
-            panic!(
-                "Incompatible transform lengths. Lengths are {} and {}",
-                self.data.len(),
-                rhs.data.len()
-            );
-        }
-        let data: Vec<_> = if self.data.len() == 1 {
-            rhs.data.iter().map(|m| self.data[0] * m).collect()
-        } else {
-            self.data.iter().zip(rhs.data).map(|(l, r)| l * r).collect()
-        };
+    fn mul(self, rhs: Transform<'b, G, B>) -> Self::Output {
+        let data = self.data * rhs.data; 
         Transform {
             data,
             _from: PhantomData,
@@ -43,10 +36,6 @@ where
     }
 }
 
-pub trait Mldivide<Rhs> {
-    type Output;
-    fn mldivide(self, rhs: Rhs) -> Self::Output;
-}
 
 impl<'b, T, G, F> Mldivide<Transform<'b, G, T>> for Transform<'_, G, F>
 where
@@ -56,9 +45,10 @@ where
 {
     type Output = Transform<'b, F, T>;
 
-    fn mldivide(self, rhs: Transform<'b, G, T>) -> Self::Output {
-       // if different lengths panic 
-        let data = self.data.iter().zip(rhs.data).map(|(l,r)| l.try_inverse().unwrap() * r).collect();
+    fn mldivide(&self, rhs: &Transform<'b, G, T>) -> Self::Output {
+        let lu = na::LU::new(self.data.into());
+        let matrix = lu.solve(&rhs.data.into()).unwrap();
+        let data = na::Transform3::from_matrix_unchecked(matrix);
         Self::Output {
             data,
             _from: PhantomData,
@@ -72,11 +62,14 @@ where
     T: IsFrameOfReference,
     V: IsFrameOfReference,
 {
-    pub fn new(data: &'a [na::Transform3<f64>]) -> Transform<'a, T, V> {
+    pub fn new(data: na::Transform3<f64>) -> Transform<'a, T, V> {
         Transform {
-            data: data.to_owned(),
+            data,
             _from: PhantomData,
             _to: PhantomData,
         }
+    }
+    pub fn inner(&self) -> &na::Transform3<f64> {
+        &self.data
     }
 }

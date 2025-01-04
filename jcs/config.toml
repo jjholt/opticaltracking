@@ -1,0 +1,17 @@
+[label.polaris]
+tibia = "T"
+femur = "Y"
+patella = "J"
+probe = "Probe"
+
+[label.certus]
+tibia = "tibia"
+femur = "femur"
+patella = "patella"
+probe = "Probe" # Don't change this even if the probe is called something else.
+
+[config.stl]
+tibia_left = "models/tibia-left.stl"
+tibia_right = "models/tibia-right-test.stl"
+femur_left = "models/femur-left.stl"
+femur_right = "models/femur-right.stl"

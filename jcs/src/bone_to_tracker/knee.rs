@@ -1,24 +1,16 @@
 #![allow(non_camel_case_types)]
-use crate::transform::{IsFrameOfReference, Mldivide, Transform};
-use crate::{Global, RigidBody, Tracker};
+use crate::data::Position;
+use crate::transform::{Mldivide, Transform};
+use crate::{RigidBody, Tracker};
 use nalgebra as na;
 
-use super::landmark::Position;
-use super::Landmark;
+use super::{Bone, Global, Landmark, Side};
 use super::orientation::*;
 
-pub enum Side {
-    Right,
-    Left,
-}
 pub type RBTibia = RigidBody<1>;
 pub type RBFemur = RigidBody<2>;
 pub type RBPatella = RigidBody<3>;
 
-trait Bone {
-    type Body: IsFrameOfReference;
-    fn fixed_frame(&self) -> Transform<'_, Global, Self::Body>;
-}
 pub struct Tibia {
     side: Side,
     medial: Landmark<RBTibia, Medial>,
@@ -38,12 +30,23 @@ pub struct Patella {
     distal: Landmark<RBPatella, Distal>,
 }
 
+type ttTt<'a> = Transform<'a, Tracker<RBTibia>, RBTibia>;
+type gTtt<'a> = Transform<'a, Global, Tracker<RBTibia>>;
+type gTt<'a> = Transform<'a, Global, RBTibia>;
+
 impl Tibia {
-    pub fn tracker_in_global(position: &Position) -> Transform<'_, Global, Tracker<RBTibia>> {
+    pub fn tracker_in_global(position: &Position) -> gTtt {
         Transform::<Global, Tracker<RBTibia>>::new(position.to_transform())
     }
-    pub fn in_tracker(&self, tracker: &Transform<'_, Global, Tracker<RBTibia>> ) -> Transform<'_, Tracker<RBTibia>, RBTibia> {
+    pub fn in_tracker(&self, tracker: &gTtt) -> ttTt {
         tracker.mldivide(&self.fixed_frame())
+    }
+    pub fn in_global(&self) -> gTt {
+        todo!()
+    }
+    #[cfg(test)]
+    pub fn new(side: Side, medial: Landmark<RBTibia, Medial>, lateral: Landmark<RBTibia, Lateral> , distal: Landmark<RBTibia, Distal>) -> Self {
+        Self {side, medial, lateral, distal}
     }
 }
 
@@ -63,20 +66,22 @@ impl Femur {
     }
     #[cfg(test)]
     pub(crate) fn new(side: Side, medial: Landmark<RBFemur, Medial>, lateral: Landmark<RBFemur, Lateral>, proximal: Landmark<RBFemur, Proximal>) -> Self {
-        Self {
-            side,
-            medial,
-            lateral,
-            proximal,
-        }
+        Self {side, medial, lateral, proximal}
     }
 }
+
+type ptTp<'a> = Transform<'a, Tracker<RBPatella>, RBPatella>;
+type gTpt<'a> = Transform<'a, Global, Tracker<RBPatella>>;
+type gTp<'a> = Transform<'a, Global, RBPatella>;
 impl Patella {
-    pub fn tracker_in_global(position: &Position) -> Transform<'_, Global, Tracker<RBPatella>> {
+    pub fn tracker_in_global(position: &Position) -> gTpt {
         Transform::<Global, Tracker<RBPatella>>::new(position.to_transform())
     }
-    pub fn in_tracker(&self, tracker: &Transform<'_, Global, Tracker<RBPatella>> ) -> Transform<'_, Tracker<RBPatella>, RBPatella> {
+    pub fn in_tracker(&self, tracker: & gTpt ) -> ptTp {
         tracker.mldivide(&self.fixed_frame())
+    }
+    pub fn in_global(&self) -> gTp {
+        todo!()
     }
 }
 
@@ -153,7 +158,8 @@ fn transform_from(origin: na::Vector3<f64>, tempk_: na::Unit<na::Vector3<f64>>, 
 
 #[cfg(test)]
 mod test {
-    use crate::bone_to_tracker::landmark::ProbeData;
+
+    use crate::data::ProbeData;
 
     use super::*;
     
@@ -186,14 +192,14 @@ mod test {
         // Tracker
         let femur_probe_data = ProbeData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
         let position = femur_probe_data.into();
-        let gTft = Femur::tracker_in_global(&position); // Femur in global frame of reference
+        let g_t_ft = Femur::tracker_in_global(&position); // femoral tracker in global
         
-        let test = femur.in_tracker(&gTft);
-        // let test = femur.in_global();
-        println!("Femur in tracker {:#?}", test);
+
+        let t = femur.in_tracker(&g_t_ft);
+
+        println!("{:#?}", femur.in_tracker(&g_t_ft));
+        println!("Femur in tracker {:#?}", femur.in_global());
+
+
     }
-    
-
-
-    
 }

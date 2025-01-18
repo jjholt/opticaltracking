@@ -1,4 +1,5 @@
 pub trait Orientation {}
+#[derive(Debug)]
 pub struct Medial {}
 impl std::fmt::Display for Medial {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

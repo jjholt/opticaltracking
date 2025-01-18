@@ -11,20 +11,26 @@ pub use landmark::Landmark;
 pub use orientation::*;
 
 #[cfg(feature = "knee")]
-pub use knee::{Femur, Patella, RBFemur, RBPatella, RBTibia, Tibia};
+pub use knee::{Femur, Patella, Tibia};
 
-use crate::transform::{IsFrameOfReference, Transform};
+use crate::{transform::{IsFrameOfReference, Transform}, Tracker};
+use crate::transform::Mldivide;
 
 #[derive(Debug)]
-pub(crate) struct Global;
+pub struct Global;
 impl IsFrameOfReference for Global {}
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Side {
     Right,
     Left,
 }
-trait Bone {
-    type Body: IsFrameOfReference;
-    fn fixed_frame(&self) -> Transform<'_, Global, Self::Body>;
+pub trait DefinedTracker where Self: IsFrameOfReference + Sized {
+    fn fixed_frame(&self) -> Option<Transform<'_, Global, Self>>;
+    fn in_tracker<'a>(&'a self, tracker: &'a Transform<'a, Global, Tracker<Self>>) -> Option<Transform<'a, Tracker<Self>, Self>> {
+        Some(tracker.mldivide(&self.fixed_frame()?))
+    }
+    fn in_global(&self) -> Option<Transform<'_, Global, Self>> {
+        self.fixed_frame()
+    }
 }

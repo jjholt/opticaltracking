@@ -34,7 +34,7 @@ impl<RB: IsFrameOfReference, O: Orientation> Landmark<RB, O> {
     pub fn rotations(&self) -> &na::Quaternion<f64> {
         self.position.rotation()
     }
-    #[cfg(test)]
+    // #[cfg(test)]
     pub(crate) fn new(probe_name: &str, probe_label: &str, position: Position) -> Self {
         Self { probe_name: probe_name.to_string(), probe_label: probe_label.to_string(), position, bone: PhantomData, orientation: PhantomData }
     }
@@ -44,7 +44,7 @@ impl<RB: IsFrameOfReference, O: Orientation> Landmark<RB, O> {
 #[cfg(test)]
 mod valid_landmarks {
 
-    use crate::{bone_to_tracker::knee::RBTibia, data::ProbeData};
+    use crate::{bone_to_tracker::knee::Tibia, data::ProbeData};
 
     use super::*;
     #[test]
@@ -56,21 +56,21 @@ mod valid_landmarks {
     #[test]
     fn create_tibia() {
         let position = ProbeData::new(1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0).into();
-        let tibia_medial: Landmark<RBTibia, Medial> = Landmark {
+        let tibia_medial: Landmark<Tibia, Medial> = Landmark {
             probe_name: "Black Probe".to_string(),
             probe_label: "Probe".to_string(),
             position,
             bone: PhantomData,
             orientation: PhantomData,
         };
-        let tibia_lateral: Landmark<RBTibia, Lateral> = Landmark {
+        let tibia_lateral: Landmark<Tibia, Lateral> = Landmark {
             probe_name: "Black Probe".to_string(),
             probe_label: "Probe".to_string(),
             position,
             bone: PhantomData,
             orientation: PhantomData,
         };
-        let tibia_distal: Landmark<RBTibia, Distal> = Landmark {
+        let tibia_distal: Landmark<Tibia, Distal> = Landmark {
             probe_name: "Black Probe".to_string(),
             probe_label: "Probe".to_string(),
             position,

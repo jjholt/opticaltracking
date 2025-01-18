@@ -8,6 +8,7 @@ mod data;
 
 use std::marker::PhantomData;
 
+use bone_to_tracker::{Distal, Landmark, Lateral, Medial, Proximal, Side};
 use transform::IsFrameOfReference;
 
 pub trait IsRigidBody {}
@@ -15,8 +16,15 @@ pub trait Marker {}
 
 pub struct Probe;
 
-#[derive(Debug)]
-struct RigidBody<const ID: usize> {}
+#[derive(Debug, Default)]
+pub struct RigidBody<const ID: usize> {
+    side: Option<Side>,
+    medial: Option<Landmark<RigidBody<ID>, Medial>>,
+    lateral: Option<Landmark<RigidBody<ID>, Lateral>>,
+    distal: Option<Landmark<RigidBody<ID>, Distal>>,
+    proximal: Option<Landmark<RigidBody<ID>, Proximal>>,
+}
+
 
 #[derive(Debug)]
 pub struct Tracker<RB: IsFrameOfReference>(PhantomData<RB>);
@@ -34,17 +42,17 @@ impl Marker for Probe {}
 mod tests {
     use super::transform::Transform;
     use super::*;
-    use bone_to_tracker::{knee::{RBFemur, RBTibia}, Global};
+    use bone_to_tracker::{knee::{Femur, Tibia}, Global};
     use nalgebra as na;
     use transform::Mldivide;
 
     #[test]
     fn new_transform() {
         let transf = na::Transform3::identity();
-        let tibia = Transform::<Global, RBTibia>::new(transf);
-        let femur = Transform::<Global, RBFemur>::new(transf);
+        let tibia = Transform::<Global, Tibia>::new(transf);
+        let femur = Transform::<Global, Femur>::new(transf);
 
-        let femoral_tracker = Transform::<Global, Tracker<RBFemur>>::new(transf);
+        let femoral_tracker = Transform::<Global, Tracker<Femur>>::new(transf);
 
         let tibia_in_femur = femur.mldivide(&tibia);
         let femur_in_femoral_tracker = femoral_tracker.mldivide(&femur);

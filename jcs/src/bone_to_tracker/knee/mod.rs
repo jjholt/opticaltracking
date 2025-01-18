@@ -1,9 +1,8 @@
 #![allow(non_camel_case_types)]
-use crate::{transform::Transform, RigidBody, Tracker};
-
-use super::Global;
-
 mod rigid_body;
+
+use crate::{transform::Transform, RigidBody, Tracker};
+use super::Global;
 
 pub type Tibia = RigidBody<1>;
 pub type Femur = RigidBody<2>;

@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use super::orientation::*;
 
 use crate::{IsFrameOfReference};
-use crate::data::{Position, ProbeData};
+use crate::data::{ProbeData, ProbeRawData};
 use nalgebra as na;
 
 #[derive(Debug)]
@@ -10,7 +10,7 @@ pub struct Landmark<RB: IsFrameOfReference, O: Orientation> {
     // Landmark should be a Datum for Probe  + bone stuff
     probe_name: String,  // Comes from data
     probe_label: String, // Comes from config
-    position: Position,
+    position: ProbeData,
     bone: PhantomData<RB>,
     orientation: PhantomData<O>,
 }
@@ -35,7 +35,7 @@ impl<RB: IsFrameOfReference, O: Orientation> Landmark<RB, O> {
         self.position.rotation()
     }
     // #[cfg(test)]
-    pub(crate) fn new(probe_name: &str, probe_label: &str, position: Position) -> Self {
+    pub(crate) fn new(probe_name: &str, probe_label: &str, position: ProbeData) -> Self {
         Self { probe_name: probe_name.to_string(), probe_label: probe_label.to_string(), position, bone: PhantomData, orientation: PhantomData }
     }
 }
@@ -44,18 +44,18 @@ impl<RB: IsFrameOfReference, O: Orientation> Landmark<RB, O> {
 #[cfg(test)]
 mod valid_landmarks {
 
-    use crate::{bone_to_tracker::knee::Tibia, data::ProbeData};
+    use crate::{bone_to_tracker::knee::Tibia, data::ProbeRawData};
 
     use super::*;
     #[test]
     fn convert_probe_data_to_pos() {
-        let datum = ProbeData::new(1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0) ;
-        let probe_data: Position = datum.into();
-        assert_eq!(probe_data, Position::new(&datum))
+        let datum = ProbeRawData::new(1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0) ;
+        let probe_data: ProbeData = datum.into();
+        assert_eq!(probe_data, ProbeData::new(&datum))
     }
     #[test]
     fn create_tibia() {
-        let position = ProbeData::new(1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0).into();
+        let position = ProbeRawData::new(1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0).into();
         let tibia_medial: Landmark<Tibia, Medial> = Landmark {
             probe_name: "Black Probe".to_string(),
             probe_label: "Probe".to_string(),

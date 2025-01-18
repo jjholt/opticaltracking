@@ -1,4 +1,4 @@
-use crate::data::{Position, ProbeData};
+use crate::data::{ProbeData, ProbeRawData};
 use crate::transform::{Mldivide, Transform};
 use crate::{RigidBody, Tracker};
 use super::{Tibia, Femur, Patella};
@@ -14,32 +14,32 @@ impl<const ID: usize> RigidBody<ID> {
     pub fn new() -> RigidBody<ID> {
         Self::default()
     }
-    pub fn set_medial(mut self, position: Position) -> Self {
-        self.medial =  Some(Landmark::<RigidBody<ID>, Medial>::new("Black Probe", "Probe", position));
+    pub fn set_medial(mut self, probe_data: ProbeData) -> Self {
+        self.medial =  Some(Landmark::<RigidBody<ID>, Medial>::new("Black Probe", "Probe", probe_data));
         self
     }
-    pub fn set_lateral(mut self, position: Position) -> Self {
-        self.lateral=  Some(Landmark::<RigidBody<ID>, Lateral>::new("Black Probe", "Probe", position));
+    pub fn set_lateral(mut self, probe_data: ProbeData) -> Self {
+        self.lateral=  Some(Landmark::<RigidBody<ID>, Lateral>::new("Black Probe", "Probe", probe_data));
         self
     }
     pub fn set_side(mut self, side: Side) -> Self {
         self.side = Some(side);
         self
     }
-    pub fn tracker_in_global<'a>(position: Position) -> Transform<'a, Global, Tracker<Self>> {
-        Transform::<Global, Tracker<Self>>::new(position.to_transform())
+    pub fn tracker_in_global<'a>(probe_data: ProbeData) -> Transform<'a, Global, Tracker<Self>> {
+        Transform::<Global, Tracker<Self>>::new(probe_data.to_transform())
     }
 }
 
 impl Tibia {
-    pub fn set_distal(mut self, position: Position) -> Self {
-        self.distal = Some(Landmark::<Self, Distal>::new("Black Probe", "Probe", position));
+    pub fn set_distal(mut self, probe_data: ProbeData) -> Self {
+        self.distal = Some(Landmark::<Self, Distal>::new("Black Probe", "Probe", probe_data));
         self
     }
 }
 impl Femur {
-    pub fn set_proximal(mut self, position: Position) -> Self {
-        self.proximal = Some(Landmark::<Self, Proximal>::new("Black Probe", "Probe", position));
+    pub fn set_proximal(mut self, probe_data: ProbeData) -> Self {
+        self.proximal = Some(Landmark::<Self, Proximal>::new("Black Probe", "Probe", probe_data));
         self
     }
 }
@@ -114,15 +114,15 @@ fn transform_from(origin: na::Vector3<f64>, tempk_: na::Unit<na::Vector3<f64>>, 
 #[cfg(test)]
 mod test {
 
-    use crate::data::ProbeData;
+    use crate::data::ProbeRawData;
 
     use super::*;
     
     #[test]
     fn creates_femoral_tracker() {
-        let femur_probe_data = ProbeData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
-        let position = Position::new(&femur_probe_data);
-        let transform = Femur::tracker_in_global(position);
+        let femur_raw_probe_data = ProbeRawData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
+        let probe_data = ProbeData::new(&femur_raw_probe_data);
+        let transform = Femur::tracker_in_global(probe_data);
         let mat = na::Matrix4::new( 0.8358,-0.3970, -0.3793, -149.4020, 0.4254, 0.9049, -0.0096, -19.4074, 0.3470, -0.1533, 0.9252, -2.1483e3, 0.0,  0.0, 0.0, 1.0); // Data generated using the matlab code
         let manual = na::Transform3::from_matrix_unchecked(mat);
         assert_relative_eq!(transform.inner(), &manual, epsilon = 5.0e-2)
@@ -133,9 +133,9 @@ mod test {
         // Landmark creation using Probe
 
         let side = Side::Right;
-        let fm = ProbeData::new(0.822817363793104, 0.135707186206897, 0.440885412068966, -0.331890289655172, 15.3196551724138, -54.9971034482759, -2097.60234482759);
-        let fl = ProbeData::new(0.403151039655172, 0.474684148275862, 0.419551994827586, -0.66038950862069, 16.9156724137931, 16.2064655172414, -2059.31424137931);
-        let fp = ProbeData::new(0.428051244067797, 0.466236162711864, 0.447185444067797, -0.631995389830509, -8.56891525423729, 15.8874915254237, -2131.43533898305);
+        let fm = ProbeRawData::new(0.822817363793104, 0.135707186206897, 0.440885412068966, -0.331890289655172, 15.3196551724138, -54.9971034482759, -2097.60234482759);
+        let fl = ProbeRawData::new(0.403151039655172, 0.474684148275862, 0.419551994827586, -0.66038950862069, 16.9156724137931, 16.2064655172414, -2059.31424137931);
+        let fp = ProbeRawData::new(0.428051244067797, 0.466236162711864, 0.447185444067797, -0.631995389830509, -8.56891525423729, 15.8874915254237, -2131.43533898305);
         
         let femur = Femur::new()
             .set_side(side)
@@ -143,7 +143,7 @@ mod test {
             .set_lateral(fl.into())
             .set_proximal(fp.into());
         // Tracker
-        let femur_probe_data = ProbeData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
+        let femur_probe_data = ProbeRawData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
         let position = femur_probe_data.into();
 
         let g_t_ft = Femur::tracker_in_global(position);

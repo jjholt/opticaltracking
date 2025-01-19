@@ -3,6 +3,7 @@ mod rigid_body;
 
 use crate::{transform::Transform, RigidBody, Tracker};
 use super::Global;
+use crate::data::Datum;
 
 pub type Tibia = RigidBody<1>;
 pub type Femur = RigidBody<2>;
@@ -21,3 +22,7 @@ type gTf<'a> = Transform<'a, Global, Femur>;
 type ptTp<'a> = Transform<'a, Tracker<Patella>, Patella>;
 type gTpt<'a> = Transform<'a, Global, Tracker<Patella>>;
 type gTp<'a> = Transform<'a, Global, Patella>;
+
+pub type TibiaData = Datum<Tracker<Tibia>>;
+pub type FemurData = Datum<Tracker<Femur>>;
+pub type PatellaData = Datum<Tracker<Patella>>;

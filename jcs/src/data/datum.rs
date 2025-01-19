@@ -1,10 +1,11 @@
 use std::marker::PhantomData;
 
-use crate::{bone_to_tracker::Global, transform::{IsFrameOfReference, Transform}, Marker};
+use crate::{bone_to_tracker::Global, transform::{IsFrameOfReference, Transform}, Marker, Tracker};
 
 use super::ProbeData;
+use crate::bone_to_tracker::knee::{TibiaData, PatellaData, FemurData};
 
-struct Datum<M: Marker> {
+pub struct Datum<M: Marker> {
     data: ProbeData,
     marker: PhantomData<M>
 }
@@ -81,14 +82,16 @@ mod datum_to_tracker {
         // Data
         //
         let y_probe = ProbeRawData::new(0.7390869, 0.1446579, 0.3029275, 0.584003, 57.113, -9.573, -1830.174);
-        let femur_datum = Datum::<Tracker<Femur>>::new(y_probe.into());
+        let femur_datum = FemurData::new(y_probe.into());
         let t_probe = ProbeRawData::new(0.0928529, -0.0505891, -0.2052756, 0.9729753, 279.027, 308.978, -1774.889);
-        let tibia_datum = Datum::<Tracker<Tibia>>::new(t_probe.into());
+        let tibia_datum = TibiaData::new(t_probe.into());
         // let f_t_t = (femur_datum.to_transform() * ft_t_f).mldivide(&(tibia_datum.to_transform() * tt_t_tc)); // Tibia in femoral frame of reference
         let g_t_fi = femur_datum.to_transform() * ft_t_f.unwrap();
         let g_t_ti = tibia_datum.to_transform() * tt_t_tc.unwrap();
 
         let f_t_t = g_t_fi.mldivide(&g_t_ti); // Tibia in femoral frame of reference
+
+        let f_t_t = (femur_datum.to_transform() * ft_t_f.unwrap()).mldivide(&(tibia_datum.to_transform() * tt_t_tc.unwrap())); // Tibia in femoral frame of reference
 
     }
     

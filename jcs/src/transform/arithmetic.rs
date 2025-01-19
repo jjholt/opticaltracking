@@ -13,6 +13,16 @@ where
     _from: PhantomData<&'a T>,
     _to: PhantomData<&'a V>,
 }
+
+impl<'a, T, V> std::fmt::Display for Transform<'a, T, V>
+where
+    T: IsFrameOfReference,
+    V: IsFrameOfReference,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.data.to_homogeneous())
+    }
+}
 pub trait Mldivide<Rhs> {
     type Output;
     fn mldivide(&self, rhs: &Rhs) -> Self::Output;

@@ -100,8 +100,10 @@ mod datum_to_tracker {
         println!("Rotation: {}", f_t_t.rotation());
         println!("Point {}", f_t_t.translation());
 
-        let motion = GroodAndSuntay::new(f_t_t).solve(femur, tibia);
-
+        let t = f_t_t.gns();
+        let motion = GroodAndSuntay::new(&f_t_t).solve(g_t_fi, g_t_ti, side);
     }
     
 }
+
+

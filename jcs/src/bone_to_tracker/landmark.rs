@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 use super::orientation::*;
 
-use crate::{IsFrameOfReference};
+use crate::IsFrameOfReference;
 use crate::data::{ProbeData, ProbeRawData};
 use nalgebra as na;
 

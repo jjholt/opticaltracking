@@ -1,4 +1,4 @@
-use crate::transform::{IsFrameOfReference, Transform};
+use crate::{transform::{IsFrameOfReference, Transform}, RigidBody};
 
 mod gns;
 mod sara;
@@ -6,7 +6,15 @@ mod helical;
 
 pub use gns::GroodAndSuntay;
 
+type LocalFloat = f32;
 pub trait Solver {
-    fn new(relative_motion: Transform<T,V>) -> Self where T: IsFrameOfReference, V: IsFrameOfReference;
-    fn solve(&self);
+    fn solve(&self, one: RigidBody, other: RigidBody) -> Motion;
+}
+pub struct Motion {
+    rx: LocalFloat,
+    ry: LocalFloat,
+    rz: LocalFloat,
+    x: LocalFloat,
+    y: LocalFloat,
+    z: LocalFloat,
 }

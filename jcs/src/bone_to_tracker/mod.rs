@@ -32,11 +32,11 @@ pub trait DefinedTracker
 where
     Self: IsFrameOfReference + Sized,
 {
-    fn fixed_frame(&self) -> Option<Transform<'_, Global, Self>>;
-    fn in_tracker<'a>( &'a self, tracker: &'_ Transform<'_, Global, Tracker<Self>>) -> Option<Transform<'_, Tracker<Self>, Self>> {
-        Some(tracker.mldivide(&self.fixed_frame()?))
-    }
-    fn in_global(&self) -> Option<Transform<'_, Global, Self>> {
+    fn fixed_frame(&self) -> Option<Transform<Global, Self>>;
+    // fn in_tracker(&self, tracker: &'_ Transform<Global, Tracker<Self>>) -> Option<Transform<Tracker<Self>, Self>> {
+    //     Some(tracker.mldivide(&self.fixed_frame()?))
+    // }
+    fn in_global(&self) -> Option<Transform<Global, Self>> {
         self.fixed_frame()
     }
 }

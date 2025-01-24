@@ -5,11 +5,12 @@ extern crate approx;
 mod bone_to_tracker;
 mod transform;
 mod data;
+mod solvers;
 
 use std::marker::PhantomData;
 
-use bone_to_tracker::{Distal, Landmark, Lateral, Medial, Proximal, Side};
-use transform::IsFrameOfReference;
+use bone_to_tracker::{Distal, Global, Landmark, Lateral, Medial, Proximal, Side};
+use transform::{IsFrameOfReference, Transform};
 
 pub trait IsRigidBody {}
 pub trait Marker {}
@@ -23,6 +24,7 @@ pub struct RigidBody<const ID: usize> {
     lateral: Option<Landmark<RigidBody<ID>, Lateral>>,
     distal: Option<Landmark<RigidBody<ID>, Distal>>,
     proximal: Option<Landmark<RigidBody<ID>, Proximal>>,
+    tracker: Option<Transform<Global, Tracker<RigidBody<ID>>>>,
 }
 
 

@@ -2,11 +2,8 @@ use nalgebra as na;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub struct ProbeData {
-    translation: na::Vector3<f64>,
-    rotation: na::UnitQuaternion<f64>,
-}
-
-impl ProbeData {
+    translation: na::Vector3<f32>,
+    rotation: na::UnitQuaternion<f32>,
 }
 
 impl std::fmt::Display for ProbeData {
@@ -18,17 +15,17 @@ impl std::fmt::Display for ProbeData {
 
 #[derive(Clone, Copy)]
 pub struct ProbeRawData {
-    q0: f64,
-    qx: f64,
-    qy: f64,
-    qz: f64,
-    x: f64,
-    y: f64,
-    z: f64,
+    q0: f32,
+    qx: f32,
+    qy: f32,
+    qz: f32,
+    x: f32,
+    y: f32,
+    z: f32,
 }
 
 impl ProbeRawData {
-    pub(crate) fn new( q0: f64, qx: f64, qy: f64, qz: f64, x: f64, y: f64, z: f64) -> ProbeRawData {
+    pub(crate) fn new( q0: f32, qx: f32, qy: f32, qz: f32, x: f32, y: f32, z: f32) -> ProbeRawData {
         Self {q0, qx, qy, qz, x, y, z}
     }
 }
@@ -45,10 +42,10 @@ impl From<ProbeRawData> for ProbeData {
 }
 
 impl ProbeData {
-    pub fn translation(&self) -> &na::Vector3<f64>{
+    pub fn translation(&self) -> &na::Vector3<f32>{
         &self.translation
     }
-    pub fn rotation(&self) -> &na::UnitQuaternion<f64> {
+    pub fn rotation(&self) -> &na::UnitQuaternion<f32> {
         &self.rotation
     }
     pub fn new(probe_data: &ProbeRawData) -> Self {
@@ -59,7 +56,7 @@ impl ProbeData {
             rotation,
         }
     }
-    pub fn to_transform(self) -> na::Transform3<f64> {
+    pub fn to_transform(self) -> na::Transform3<f32> {
         let rotation = self.rotation().to_homogeneous();
         let translation = na::Matrix4::new_translation(self.translation());
         let matrix = translation * rotation;

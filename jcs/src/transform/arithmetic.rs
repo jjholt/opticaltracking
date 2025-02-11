@@ -90,15 +90,12 @@ where
     }
     pub fn i(&self) -> na::Vector3<f32> {
         self.inner().into_inner().fixed_view::<3,1>(0, 0).into_owned()
-        // self.inner().into_inner().column(0).remove_row(3).into_owned()
     }
     pub fn j(&self) -> na::Vector3<f32> {
         self.inner().into_inner().fixed_view::<3,1>(0, 1).into_owned()
-        // self.inner().into_inner().column(1).remove_row(3).into_owned()
     }
     pub fn k(&self) -> na::Vector3<f32> {
         self.inner().into_inner().fixed_view::<3,1>(0, 2).into_owned()
-        // self.inner().into_inner().column(1).remove_row(3).into_owned()
     }
 }
 

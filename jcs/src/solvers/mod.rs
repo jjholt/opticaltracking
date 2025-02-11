@@ -5,8 +5,8 @@ mod sara;
 mod helical;
 
 pub use gns::GroodAndSuntay;
+use gns::Motion;
 
-pub trait Solver {
-    fn new(relative_motion: Transform<T,V>) -> Self where T: IsFrameOfReference, V: IsFrameOfReference;
-    fn solve(&self);
+pub trait Solver<V,T> where V: IsFrameOfReference, T: IsFrameOfReference {
+    fn solve(&self, rb2: V, rb1: T) -> Motion;
 }

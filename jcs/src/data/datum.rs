@@ -48,7 +48,7 @@ mod datum_to_tracker {
         bone_to_tracker::{Distal, Landmark, Lateral, Medial, Proximal, Femur, Tibia, Side, DefinedTracker},
         data::ProbeRawData,
         transform::Mldivide, Tracker,
-        solvers::GroodAndSuntay,
+        solvers::{GroodAndSuntay, Solver},
     };
 
     use super::*;
@@ -101,6 +101,7 @@ mod datum_to_tracker {
         println!("Point {}", f_t_t.translation());
 
         let motion = GroodAndSuntay::new(f_t_t).solve(femur, tibia);
+        println!("{:#?}", motion);
 
     }
     

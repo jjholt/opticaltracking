@@ -26,3 +26,5 @@ type gTp = Transform<Global, Patella>;
 pub type DataTibia = Datum<Tracker<Tibia>>;
 pub type DataFemur = Datum<Tracker<Femur>>;
 pub type DataPatella = Datum<Tracker<Patella>>;
+
+pub use rigid_body::*;

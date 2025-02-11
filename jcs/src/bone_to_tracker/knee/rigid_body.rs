@@ -33,17 +33,10 @@ impl<const ID: usize> RigidBody<ID> {
 }
 impl <const ID: usize> RigidBody<ID> where Self: DefinedTracker {
     pub fn take_datum(&self, datum: Datum<Tracker<Self>>) -> Option<Transform<Global, RigidBody<ID>>> {
-        let a = datum.to_transform();
-        let b = self.tracker.as_ref()?.mldivide(&self.fixed_frame()?);
-        Some(a * b)
+        Some(datum.to_transform() * self.in_tracker()?)
     }
-    pub fn origin(&self) -> na::Point3<f32> {
-        self.in_tracker()
-            .inner()
-            .transform_point(&self.tracker.as_ref().unwrap().translation())
-    }
-    fn in_tracker(&self) -> Transform<Tracker<Self>, Self> {
-        self.tracker.as_ref().unwrap().mldivide(&self.fixed_frame().unwrap())
+    pub fn in_tracker(&self) -> Option<Transform<Tracker<Self>, Self>> {
+        Some(self.tracker.as_ref()?.mldivide(&self.fixed_frame()?))
     }
 }
 
@@ -89,8 +82,8 @@ impl DefinedTracker for Femur {
         let tempk_ = na::Unit::new_normalize(prox - origin);
         let i_ = match self.side? {
             // These are inverted from expectation
-            Side::Right => na::Unit::new_normalize(med - lat),
-            Side::Left => na::Unit::new_normalize(lat - med),
+            Side::Right => na::Unit::new_normalize(lat - med),
+            Side::Left => na::Unit::new_normalize(med - lat),
         };
         let data = transform_from(origin, tempk_, i_);
         let data = na::Transform3::from_matrix_unchecked(data);

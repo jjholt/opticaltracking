@@ -1,11 +1,10 @@
 use std::marker::PhantomData;
+use nalgebra as na;
 
 use crate::{
-    bone_to_tracker::{DefinedTracker, Femur, Side, Tibia},
+    bone_to_tracker::{DefinedTracker, Femur, Global, Side, Tibia},
     transform::{IsFrameOfReference, Transform},
 };
-
-use super::Solver;
 
 pub struct GroodAndSuntay<T: IsFrameOfReference, V: IsFrameOfReference> {
     relative_motion: Transform<T, V>,
@@ -13,24 +12,20 @@ pub struct GroodAndSuntay<T: IsFrameOfReference, V: IsFrameOfReference> {
     _to: PhantomData<V>,
 }
 
-impl Solver<Femur, Tibia> for GroodAndSuntay<Femur, Tibia> where Tibia: DefinedTracker, Femur:DefinedTracker {
-    fn solve(&self, rb2: Femur, rb1: Tibia) -> Motion {
-        let tibia = rb1.in_global().unwrap();
-        let femur = rb2.in_global().unwrap();
-
+impl GroodAndSuntay<Femur, Tibia> {
+    pub fn solve(femur: Transform<Global, Femur>, tibia: Transform<Global, Tibia>, side: Side) -> Motion {
         let femur_i = femur.i();
-        let e2 = tibia.k().cross(&femur_i).normalize();
+        let e2 = na::UnitVector3::new_normalize(tibia.k().cross(&femur_i));
 
-        let flexion = (-e2).dot(&femur.k()).asin();
-        let beta = femur_i.dot(&tibia.k()).acos();
+        let flexion = (-e2).dot(&femur.k()).asin().to_degrees();
+        let beta = femur_i.dot(&tibia.k()).acos().to_degrees();
 
-        let (external, varus) = match rb2.side.unwrap() {
-            Side::Right => ((-e2).dot(&tibia.i()), 90.0 - beta),
-            Side::Left => (e2.dot(&tibia.i()).asin(), -(90.0 - beta)),
+        let (external, varus) = match side {
+            Side::Right => ((-e2).dot(&tibia.i()).asin().to_degrees(), 90.0 - beta),
+            Side::Left => (e2.dot(&tibia.i()).asin().to_degrees(), -(90.0 - beta)),
         };
-
-        let h = rb1.origin() - rb2.origin();
-        let lateral = match rb2.side.unwrap() {
+        let h = tibia.origin() - femur.origin();
+        let lateral = match side {
             Side::Right => h.dot(&femur_i),
             Side::Left => h.dot(&-femur_i),
         };
@@ -52,17 +47,17 @@ where
     T: IsFrameOfReference,
     V: IsFrameOfReference,
 {
-    pub fn new(relative_motion: Transform<T, V>) -> Self
-    where
-        T: IsFrameOfReference,
-        V: IsFrameOfReference,
-    {
-        Self {
-            relative_motion,
-            _from: PhantomData,
-            _to: PhantomData,
-        }
-    }
+    // pub fn new(relative_motion: Transform<T, V>) -> Self
+    // where
+    //     T: IsFrameOfReference,
+    //     V: IsFrameOfReference,
+    // {
+    //     Self {
+    //         relative_motion,
+    //         _from: PhantomData,
+    //         _to: PhantomData,
+    //     }
+    // }
 }
 #[derive(Debug)]
 pub struct Motion {

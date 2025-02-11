@@ -45,16 +45,15 @@ impl<M: Marker + IsFrameOfReference> Datum<M> {
 #[cfg(test)]
 mod datum_to_tracker {
     use crate::{
-        bone_to_tracker::{Distal, Landmark, Lateral, Medial, Proximal, Femur, Tibia, Side, DefinedTracker},
+        bone_to_tracker::{Femur, Tibia, Side},
         data::ProbeRawData,
-        transform::Mldivide, Tracker,
-        solvers::{GroodAndSuntay, Solver},
+        transform::Mldivide, solvers::{GroodAndSuntay},
     };
 
     use super::*;
     #[test]
     fn stuff() {
-        let side = Side::Right;
+        let side = Side::Left;
         // Femur Landmarks
         let fm = ProbeRawData::new(0.8228, 0.1357, 0.4408, -0.3318, 15.3196, -54.9971, -2097.6023);
         let fl = ProbeRawData::new(0.4031, 0.4746, 0.4195, -0.6603, 16.9156, 16.2064, -2059.3142);
@@ -67,11 +66,14 @@ mod datum_to_tracker {
 
         // Tracker positions
         let femur_tracker_data = ProbeRawData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
-        let tibia_tracker_data = ProbeRawData::new(0.9573, -0.0375, -0.1896, 0.2147, -149.4019, -19.4073, -2148.327);
+        let tibia_tracker_data = ProbeRawData::new(0.0230, -0.1878, 0.0213, 0.9817, 128.0411, 196.8627, -2024.9063);
 
         // Data
-        let f_data = ProbeRawData::new(0.7390869, 0.1446579, 0.3029275, 0.584003, 57.113, -9.573, -1830.174);
-        let t_data = ProbeRawData::new(0.0928529, -0.0505891, -0.2052756, 0.9729753, 279.027, 308.978, -1774.889);
+        let f_data = ProbeRawData::new(0.7169, 0.1776, 0.4286, 0.5204, -37.7920, -136.356, -1953.203);
+        let t_data = ProbeRawData::new(0.0347, -0.1902, 0.0599, 0.9793, 128.2, 205.321, -2050.397);
+
+
+
 
         let femur = Femur::new()
             .set_side(side)
@@ -86,6 +88,9 @@ mod datum_to_tracker {
             .set_lateral(tl.into())
             .set_distal(td.into())
             .set_tracker(tibia_tracker_data.into()); // <- g_t_tt
+                                                     //
+                                                     
+        // println!("tibia tracker in global{}", tibia.tracker.as_ref().unwrap()); // gTtt0
 
 
         let g_t_ti = tibia.take_datum(t_data.into()).unwrap();
@@ -100,9 +105,11 @@ mod datum_to_tracker {
         println!("Rotation: {}", f_t_t.rotation());
         println!("Point {}", f_t_t.translation());
 
-        let motion = GroodAndSuntay::new(f_t_t).solve(femur, tibia);
+        let motion = GroodAndSuntay::solve(g_t_fi, g_t_ti, side);
         println!("{:#?}", motion);
 
     }
     
 }
+
+

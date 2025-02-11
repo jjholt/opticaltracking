@@ -97,8 +97,10 @@ where
     pub fn k(&self) -> na::Vector3<f32> {
         self.inner().into_inner().fixed_view::<3,1>(0, 2).into_owned()
     }
+    pub fn origin(&self) -> na::Point3<f32>{
+        self.inner().into_inner().fixed_view::<3,1>(0, 3).into_owned().into()
+    }
 }
-
 #[cfg(test)]
 mod test {
     use core::f32;

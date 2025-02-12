@@ -108,11 +108,6 @@ mod test {
     use crate::bone_to_tracker::{Femur, Global};
 
     use super::*;
-
-    #[test]
-    fn point_from_transform() {
-        unimplemented!()
-    }
     #[test]
     fn unitq_from_transform() {
         let rotation = na::Rotation3::<f32>::from_axis_angle(&na::Vector3::x_axis(), f32::consts::FRAC_PI_6);

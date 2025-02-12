@@ -13,11 +13,8 @@ pub use orientation::*;
 #[cfg(feature = "knee")]
 pub use knee::{Femur, Patella, Tibia};
 
-use crate::transform::Mldivide;
-use crate::{
-    transform::{IsFrameOfReference, Transform},
-    Tracker,
-};
+use crate::transform::gT;
+use crate::transform::IsFrameOfReference;
 
 #[derive(Debug)]
 pub struct Global;
@@ -28,15 +25,18 @@ pub enum Side {
     Right,
     Left,
 }
+#[derive(Debug)]
+pub struct Motion {
+    flexion: f32,
+    external: f32,
+    varus: f32,
+    anterior: f32,
+    distal: f32,
+    lateral: f32,
+}
 pub trait DefinedTracker
 where
     Self: IsFrameOfReference + Sized,
 {
-    fn fixed_frame(&self) -> Option<Transform<Global, Self>>;
-    // fn in_tracker(&self, tracker: &'_ Transform<Global, Tracker<Self>>) -> Option<Transform<Tracker<Self>, Self>> {
-    //     Some(tracker.mldivide(&self.fixed_frame()?))
-    // }
-    fn in_global(&self) -> Option<Transform<Global, Self>> {
-        self.fixed_frame()
-    }
+    fn in_global(&self) -> Option<gT<Self>>;
 }

@@ -1,6 +1,6 @@
 use super::{Femur, Patella, Tibia};
-use crate::data::{Datum, ProbeData, ProbeRawData};
-use crate::transform::{Mldivide, Transform};
+use crate::data::{Datum, ProbeData};
+use crate::transform::{gT, tT, Mldivide, Transform};
 use crate::{RigidBody, Tracker};
 
 use nalgebra as na;
@@ -27,16 +27,16 @@ impl<const ID: usize> RigidBody<ID> {
         self.side = Some(side);
         self
     }
-    pub fn tracker_in_global(probe_data: ProbeData) -> Transform<Global, Tracker<Self>> {
+    pub fn tracker_in_global(probe_data: ProbeData) -> gT<Tracker<Self>> {
         Transform::<Global, Tracker<RigidBody<ID>>>::new(probe_data.to_transform())
     }
 }
 impl <const ID: usize> RigidBody<ID> where Self: DefinedTracker {
-    pub fn take_datum(&self, datum: Datum<Tracker<Self>>) -> Option<Transform<Global, RigidBody<ID>>> {
+    pub fn take_datum(&self, datum: Datum<Tracker<Self>>) -> Option<gT<RigidBody<ID>>> {
         Some(datum.to_transform() * self.in_tracker()?)
     }
-    pub fn in_tracker(&self) -> Option<Transform<Tracker<Self>, Self>> {
-        Some(self.tracker.as_ref()?.mldivide(&self.fixed_frame()?))
+    pub fn in_tracker(&self) -> Option<tT<Self>> {
+        Some(self.tracker.as_ref()?.mldivide(&self.in_global()?))
     }
 }
 
@@ -54,7 +54,7 @@ impl Femur {
 }
 
 impl DefinedTracker for Tibia {
-    fn fixed_frame(&self) -> Option<Transform<Global, Self>> {
+    fn in_global(&self) -> Option<gT<Self>> {
         let med = self.medial.as_ref()?.translations();
         let lat = self.lateral.as_ref()?.translations();
         let dist = self.distal.as_ref()?.translations();
@@ -72,7 +72,7 @@ impl DefinedTracker for Tibia {
 }
 
 impl DefinedTracker for Femur {
-    fn fixed_frame(&self) -> Option<Transform<Global, Self>> {
+    fn in_global(&self) -> Option<gT<Self>> {
         // These were modified to match the result observed in matlab
         let med = self.medial.as_ref()?.translations();
         let lat = self.lateral.as_ref()?.translations();
@@ -92,7 +92,7 @@ impl DefinedTracker for Femur {
 }
 
 impl DefinedTracker for Patella {
-    fn fixed_frame(&self) -> Option<Transform<Global, Self>> {
+    fn in_global(&self) -> Option<gT<Self>> {
         let med = self.medial.as_ref()?.translations();
         let lat = self.lateral.as_ref()?.translations();
         let dist = self.distal.as_ref()?.translations();
@@ -163,7 +163,7 @@ mod test {
         let femur_probe_data = ProbeRawData::new(0.9573733, -0.0372205, -0.1895465, 0.2147628, -149.371, -19.411, -2148.287);
         let position = femur_probe_data.into();
 
-        let g_t_ft = Femur::tracker_in_global(position);
+        let _g_t_ft = Femur::tracker_in_global(position);
         println!("Femur in tracker {}", femur.in_global().unwrap());
     }
 }

@@ -1,9 +1,8 @@
 use std::marker::PhantomData;
 
-use crate::{bone_to_tracker::Global, transform::{IsFrameOfReference, Transform}, Marker, Tracker};
+use crate::{bone_to_tracker::Global, transform::{gT, IsFrameOfReference, Transform}, Marker};
 
 use super::{ProbeData, ProbeRawData};
-use crate::bone_to_tracker::knee::{DataTibia, DataPatella, DataFemur};
 
 pub struct Datum<M: Marker> {
     data: ProbeData,
@@ -24,7 +23,7 @@ impl<M: Marker + IsFrameOfReference> Datum<M> {
             marker: PhantomData,
         }
     }
-    pub fn to_transform(&self) -> Transform<Global, M> {
+    pub fn to_transform(&self) -> gT<M> {
         Transform::<Global, M>::new(self.data.to_transform())
     }
 }
@@ -45,12 +44,9 @@ impl<M: Marker + IsFrameOfReference> Datum<M> {
 #[cfg(test)]
 mod datum_to_tracker {
     use crate::{
-        bone_to_tracker::{Femur, Tibia, Side},
-        data::ProbeRawData,
-        transform::Mldivide, solvers::{GroodAndSuntay},
+        bone_to_tracker::{Femur, Side, Tibia}, data::ProbeRawData, transform::Mldivide
     };
 
-    use super::*;
     #[test]
     fn stuff() {
         let side = Side::Left;
@@ -73,8 +69,6 @@ mod datum_to_tracker {
         let t_data = ProbeRawData::new(0.0347, -0.1902, 0.0599, 0.9793, 128.2, 205.321, -2050.397);
 
 
-
-
         let femur = Femur::new()
             .set_side(side)
             .set_medial(fm.into())
@@ -88,25 +82,19 @@ mod datum_to_tracker {
             .set_lateral(tl.into())
             .set_distal(td.into())
             .set_tracker(tibia_tracker_data.into()); // <- g_t_tt
-                                                     //
-                                                     
-        // println!("tibia tracker in global{}", tibia.tracker.as_ref().unwrap()); // gTtt0
 
 
         let g_t_ti = tibia.take_datum(t_data.into()).unwrap();
         let g_t_fi = femur.take_datum(f_data.into()).unwrap();
 
-        println!("femur in global, i vector: {}", g_t_fi.i());
-        println!("total transform{}", g_t_fi);
+        println!("femur in global {}", g_t_fi);
+        println!("tibia in global {}", g_t_ti);
         
-        let f_t_t = g_t_fi.mldivide(&g_t_ti); // Tibia in femoral frame of reference
+        let _f_t_t = g_t_fi.mldivide(&g_t_ti); // Tibia in femoral frame of reference
 
-        println!("Transform {}", f_t_t);
-        println!("Rotation: {}", f_t_t.rotation());
-        println!("Point {}", f_t_t.translation());
-
-        let motion = GroodAndSuntay::solve(g_t_fi, g_t_ti, side);
-        println!("{:#?}", motion);
+        // println!("Transform {}", f_t_t);
+        // println!("Rotation: {}", f_t_t.rotation());
+        // println!("Point {}", f_t_t.translation());
 
     }
     

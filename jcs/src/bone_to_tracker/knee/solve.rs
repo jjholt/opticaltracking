@@ -106,8 +106,4 @@ mod test {
         };
         let motion = GroodAndSuntay::tibiofemoral().solve(g_t_f, g_t_t, side);
     }
-    #[test]
-    fn patellofemoral_gns() {
-        unimplemented!()
-    }
 }

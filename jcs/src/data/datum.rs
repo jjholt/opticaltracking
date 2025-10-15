@@ -69,27 +69,23 @@ mod datum_to_tracker {
         let t_data = ProbeRawData::new(0.0347, -0.1902, 0.0599, 0.9793, 128.2, 205.321, -2050.397);
 
 
-        let femur = Femur::new()
-            .set_side(side)
-            .set_medial(fm.into())
-            .set_lateral(fl.into())
-            .set_proximal(fp.into())
-            .set_tracker(femur_tracker_data.into()); // <- g_t_ft 
+        let femur = Femur::new(
+            side,
+            fm.into(),
+            fl.into(),
+            fp.into(),
+            femur_tracker_data.into(),
+        );
 
-        let tibia = Tibia::new()
-            .set_side(side)
-            .set_medial(tm.into())
-            .set_lateral(tl.into())
-            .set_distal(td.into())
-            .set_tracker(tibia_tracker_data.into()); // <- g_t_tt
+        let tibia = Tibia::new( side, tm.into(), tl.into(), td.into(), tibia_tracker_data.into());
 
 
-        let g_t_ti = tibia.take_datum(t_data.into()).unwrap();
-        let g_t_fi = femur.take_datum(f_data.into()).unwrap();
+        let g_t_ti = tibia.take_datum(t_data.into());
+        let g_t_fi = femur.take_datum(f_data.into());
 
         println!("femur in global {}", g_t_fi);
         println!("tibia in global {}", g_t_ti);
-        
+
         let _f_t_t = g_t_fi.mldivide(&g_t_ti); // Tibia in femoral frame of reference
 
         // println!("Transform {}", f_t_t);

@@ -38,5 +38,5 @@ pub trait DefinedTracker
 where
     Self: IsFrameOfReference + Sized,
 {
-    fn in_global(&self) -> Option<gT<Self>>;
+    fn in_global(&self) -> gT<Self>;
 }

@@ -1,7 +1,7 @@
 use super::{Femur, Patella, Tibia};
 use crate::data::{Datum, ProbeData};
 use crate::transform::{gT, tT, Mldivide, Transform};
-use crate::{FarLandmark, RigidBody, Tracker};
+use crate::{ProximalDistal, RigidBody, Tracker};
 
 use nalgebra as na;
 
@@ -12,19 +12,19 @@ impl<const ID: usize> RigidBody<ID> {
         side: Side,
         medial: ProbeData,
         lateral: ProbeData,
-        far_landmark: ProbeData,
+        proximal_distal: ProbeData,
         tracker: ProbeData,
     ) -> RigidBody<ID> {
         let med = Landmark::<RigidBody<ID>, Medial>::new("Black Probe", "Probe", medial);
         let lat = Landmark::<RigidBody<ID>, Lateral>::new("Black Probe", "Probe", lateral);
-        let far = Landmark::<RigidBody<ID>, FarLandmark>::new("Black Probe", "Probe", far_landmark);
+        let prox_dist = Landmark::<RigidBody<ID>, ProximalDistal>::new("Black Probe", "Probe", proximal_distal);
         let track = Transform::<Global, Tracker<RigidBody<ID>>>::new(tracker.to_transform());
 
         Self {
             side,
             medial: med,
             lateral: lat,
-            far_landmark: far,
+            proximal_distal: prox_dist,
             tracker: track,
         }
     }
@@ -48,7 +48,7 @@ impl DefinedTracker for Tibia {
     fn in_global(&self) -> gT<Self> {
         let med = self.medial.translations();
         let lat = self.lateral.translations();
-        let dist = self.far_landmark.translations();
+        let dist = self.proximal_distal.translations();
         let origin = (med + lat) / 2.0;
 
         let tempk_ = na::Unit::new_normalize(origin - dist);
@@ -67,7 +67,7 @@ impl DefinedTracker for Femur {
         // These were modified to match the result observed in matlab
         let med = self.medial.translations();
         let lat = self.lateral.translations();
-        let prox = self.far_landmark.translations();
+        let prox = self.proximal_distal.translations();
         let origin = (med + lat) / 2.0;
 
         let tempk_ = na::Unit::new_normalize(prox - origin);
@@ -86,7 +86,7 @@ impl DefinedTracker for Patella {
     fn in_global(&self) -> gT<Self> {
         let med = self.medial.translations();
         let lat = self.lateral.translations();
-        let dist = self.far_landmark.translations();
+        let dist = self.proximal_distal.translations();
         let origin = (med + lat) / 2.0;
 
         let tempk_ = na::Unit::new_normalize(origin - dist);

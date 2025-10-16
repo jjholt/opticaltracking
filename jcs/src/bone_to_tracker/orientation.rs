@@ -13,13 +13,10 @@ pub struct Anterior {}
 #[derive(Debug)]
 pub struct Posterior {}
 #[derive(Debug)]
-pub struct Proximal {}
-#[derive(Debug)]
-pub struct Distal {}
+pub struct ProximalDistal {}
 
 impl Orientation for Medial {}
 impl Orientation for Lateral {}
 impl Orientation for Anterior {}
 impl Orientation for Posterior {}
-impl Orientation for Proximal {}
-impl Orientation for Distal {}
+impl Orientation for ProximalDistal {}

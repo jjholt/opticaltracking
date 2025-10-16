@@ -71,9 +71,9 @@ mod datum_to_tracker {
         let t_data = ProbeRawData::new(name, label, 0.0347, -0.1902, 0.0599, 0.9793, 128.2, 205.321, -2050.397);
 
 
-        let femur = Femur::new( side, fm.into(), fl.into(), fp.into(), femur_tracker_data.into());
+        let femur = Femur::new(side, fm.into(), fl.into(), fp.into(), femur_tracker_data.into());
 
-        let tibia = Tibia::new( side, tm.into(), tl.into(), td.into(), tibia_tracker_data.into());
+        let tibia = Tibia::new(side, tm.into(), tl.into(), td.into(), tibia_tracker_data.into());
 
 
         let g_t_ti = tibia.take_datum(t_data.into());

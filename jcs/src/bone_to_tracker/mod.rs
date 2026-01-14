@@ -34,6 +34,8 @@ pub struct Motion {
     distal: f32,
     lateral: f32,
 }
+
+pub struct Kinematics(Vec<Motion>);
 pub trait DefinedTracker
 where
     Self: IsFrameOfReference + Sized,

@@ -5,12 +5,17 @@ extern crate approx;
 mod bone_to_tracker;
 mod data;
 mod solvers;
-mod transform;
+pub mod transform;
+pub mod prelude;
 
 use std::marker::PhantomData;
 
 use bone_to_tracker::{Landmark, Lateral, Medial, ProximalDistal, Side};
 use transform::{gT, IsFrameOfReference};
+
+pub use crate::prelude::*;
+// pub use transform::Transform;
+// pub use bone_to_tracker::Kinematics;
 
 pub trait IsRigidBody {}
 pub trait Marker {}

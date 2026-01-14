@@ -79,12 +79,12 @@ mod datum_to_tracker {
         let g_t_ti = tibia.take_datum(t_data.into());
         let g_t_fi = femur.take_datum(f_data.into());
 
-        println!("femur in global {}", g_t_fi);
-        println!("tibia in global {}", g_t_ti);
+        // println!("femur in global {}", g_t_fi);
+        // println!("tibia in global {}", g_t_ti);
 
-        let _f_t_t = g_t_fi.mldivide(&g_t_ti); // Tibia in femoral frame of reference
+        let f_t_t = g_t_fi.mldivide(&g_t_ti); // Tibia in femoral frame of reference
 
-        // println!("Transform {}", f_t_t);
+        println!("Tibia in femur {}", f_t_t);
         // println!("Rotation: {}", f_t_t.rotation());
         // println!("Point {}", f_t_t.translation());
 

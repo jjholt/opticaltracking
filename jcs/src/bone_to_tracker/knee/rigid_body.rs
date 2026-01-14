@@ -15,9 +15,11 @@ impl<const ID: usize> RigidBody<ID> {
         proximal_distal: ProbeData,
         tracker: ProbeData,
     ) -> RigidBody<ID> {
-        let med = Landmark::<RigidBody<ID>, Medial>::new("Black Probe", "Probe", medial);
-        let lat = Landmark::<RigidBody<ID>, Lateral>::new("Black Probe", "Probe", lateral);
-        let prox_dist = Landmark::<RigidBody<ID>, ProximalDistal>::new("Black Probe", "Probe", proximal_distal);
+        let name = "Black Probe";
+        let label = "Probe";
+        let med = Landmark::<RigidBody<ID>, Medial>::new(name, label, medial);
+        let lat = Landmark::<RigidBody<ID>, Lateral>::new(name, label, lateral);
+        let prox_dist = Landmark::<RigidBody<ID>, ProximalDistal>::new(name, label, proximal_distal);
         let track = Transform::<Global, Tracker<RigidBody<ID>>>::new(tracker.to_transform());
 
         Self {
@@ -161,6 +163,7 @@ mod test {
         let tracker = femur_probe_data.into();
 
         let femur = Femur::new(side, fm, fl, fp, tracker);
-        println!("Femur in tracker {}", femur.in_global());
+        println!("Femur in global {}", femur.in_global());
+        println!("Femur in tracker {}", femur.in_tracker());
     }
 }

@@ -1,6 +1,6 @@
-mod certus;
-mod polaris;
-mod parse_csv;
+mod marker;
+mod camera;
+
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
 }
@@ -15,4 +15,3 @@ mod tests {
         assert_eq!(result, 4);
     }
 }
-

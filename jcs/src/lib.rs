@@ -1,43 +1,34 @@
-#![allow(unused)]
-#[macro_use]
-extern crate approx;
+mod tracker;
+mod landmark;
 
-mod bone_to_tracker;
-mod data;
-mod solvers;
-pub mod transform;
-pub mod prelude;
+#[cfg(feature = "knee")]
+mod knee;
 
-use std::marker::PhantomData;
+#[cfg(feature = "hip")]
+mod hip;
 
-use bone_to_tracker::{Landmark, Lateral, Medial, ProximalDistal, Side};
-use transform::{gT, IsFrameOfReference};
+use attitude_determination::FrameOfReference;
 
-pub use crate::prelude::*;
-// pub use transform::Transform;
-// pub use bone_to_tracker::Kinematics;
+pub struct RigidBody<const N: usize> {}
 
-pub trait IsRigidBody {}
-pub trait Marker {}
+impl <const N: usize> FrameOfReference for RigidBody<N> { }
 
-pub struct Probe;
 
-#[derive(Debug)]
-pub struct RigidBody<const ID: usize> {
-    side: Side,
-    medial: Landmark<RigidBody<ID>, Medial>,
-    lateral: Landmark<RigidBody<ID>, Lateral>,
-    proximal_distal: Landmark<RigidBody<ID>, ProximalDistal>,
-    tracker: gT<Tracker<RigidBody<ID>>>,
+
+
+
+
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
 }
 
-#[derive(Debug)]
-pub struct Tracker<RB: IsFrameOfReference>(PhantomData<RB>);
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<const ID: usize> IsFrameOfReference for RigidBody<ID> {}
-impl<const ID: usize> IsRigidBody for RigidBody<ID> {}
-
-impl<RB: IsFrameOfReference> Marker for Tracker<RB> {}
-impl<RB: IsFrameOfReference> IsFrameOfReference for Tracker<RB> {}
-
-impl Marker for Probe {}
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}

@@ -1,13 +1,11 @@
-use std::{fmt, marker::PhantomData, ops};
+mod operations;
+mod equality;
+use std::{fmt, marker::PhantomData};
 
 use nalgebra as na;
 
 pub trait FrameOfReference: PartialEq {}
 
-pub trait Mldivide<Rhs> {
-    type Output;
-    fn mldivide(&self, rhs: &Rhs) -> Self::Output;
-}
 
 #[derive(Debug, PartialEq)]
 pub struct Transform<R, A>
@@ -20,36 +18,6 @@ where
     matrix: na::Affine3<f64>,
 }
 
-impl<R, A> approx::AbsDiffEq for Transform<R, A>
-where
-    A: FrameOfReference,
-    R: FrameOfReference,
-{
-    type Epsilon = f64;
-
-    fn default_epsilon() -> Self::Epsilon {
-        std::f64::EPSILON
-    }
-
-    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        self.matrix.abs_diff_eq(&other.matrix, epsilon)
-    }
-}
-
-impl<R, A> approx::RelativeEq for Transform<R, A>
-where
-    A: FrameOfReference,
-    R: FrameOfReference,
-{
-    fn default_max_relative() -> Self::Epsilon {
-        std::f64::EPSILON
-    }
-
-    fn relative_eq(&self, other: &Self, epsilon: Self::Epsilon, max_relative: Self::Epsilon)
-        -> bool {
-            self.matrix.relative_eq(&other.matrix, epsilon, max_relative)
-    }
-}
 
 impl<R, A> Transform<R, A>
 where
@@ -75,68 +43,12 @@ where
     }
 }
 
-impl<R, A, B> ops::Div<Transform<B, A>> for Transform<R, A>
-where
-    R: FrameOfReference,
-    A: FrameOfReference,
-    B: FrameOfReference,
-{
-    type Output = Transform<R, B>;
-
-    /// Solves `xA = B`, i.e., `A * inv(B)`
-    ///
-    /// if `A` is tibia in the global frame of reference (`gTt`), and `B` is tibia in the femoral frame of reference (`fTt`)
-    /// then `A / B` describes femur in the global frame of reference (`gTf`)
-    fn div(self, rhs: Transform<B, A>) -> Self::Output {
-        Transform {
-            reference: PhantomData,
-            subject: PhantomData,
-            matrix: self.matrix * rhs.matrix.inverse(),
-        }
-    }
-}
-
-impl<R, A, B> Mldivide<Transform<A, B>> for Transform<A, R>
-where
-    R: FrameOfReference,
-    A: FrameOfReference,
-    B: FrameOfReference,
-{
-    type Output = Transform<R, B>;
-
-    /// Solves Ax = B. i.e., solves inv(A) * B
-    fn mldivide(&self, rhs: &Transform<A, B>) -> Self::Output {
-        let lu = na::LU::new(self.matrix.into());
-        let matrix = lu.solve(&rhs.matrix.into()).unwrap();
-        Transform {
-            reference: PhantomData,
-            subject: PhantomData,
-            matrix: na::Affine3::from_matrix_unchecked(matrix),
-        }
-    }
-}
-
-impl<R, A, B> ops::Mul<Transform<A, B>> for Transform<R, A>
-where
-    R: FrameOfReference,
-    A: FrameOfReference,
-    B: FrameOfReference,
-{
-    type Output = Transform<R, B>;
-
-    fn mul(self, rhs: Transform<A, B>) -> Self::Output {
-        Transform {
-            reference: PhantomData,
-            subject: PhantomData,
-            matrix: self.matrix * rhs.matrix,
-        }
-    }
-}
 
 #[cfg(test)]
 mod test {
 
     use super::*;
+    use crate::operations::Mldivide;
 
     use approx::assert_relative_eq;
 

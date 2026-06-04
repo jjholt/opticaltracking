@@ -43,10 +43,9 @@ pub fn read(input: &str) -> Vec<Marker> {
 
 #[inline]
 fn parse_f32(s: &str) -> f32 {
-    s.trim()
-        .parse::<f32>()
+    lexical::parse(s.trim())
         .ok()
-        .filter(|f| f.abs() < 1e20)
+        .filter(|f: &f32| f.abs() < 1e20)
         .unwrap_or(f32::NAN)
 }
 

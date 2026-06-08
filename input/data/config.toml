@@ -1,0 +1,13 @@
+[camera_labels.Polaris]
+probe = "Probe"
+tibia = "T"
+femur = "Y"
+# patella = ""
+# hip = ""
+
+[camera_labels.Certus]
+probe = "Probe"
+tibia = "tibia"
+femur = "femur"
+patella = "patella"
+# hip = ""

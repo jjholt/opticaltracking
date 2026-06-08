@@ -1,1 +1,1 @@
-trait Landmark {}
+pub trait Landmark {}

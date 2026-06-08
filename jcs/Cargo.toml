@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 attitude_determination = { path = "../attitude_determination" }
+input = { path = "../input" }
 [features]
 default = ["knee"]
 knee = []

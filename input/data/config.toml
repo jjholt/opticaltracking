@@ -11,3 +11,8 @@ tibia = "tibia"
 femur = "femur"
 patella = "patella"
 # hip = ""
+
+[digitisation]
+# folders = ["digit", "calibr"]
+# angle = 0.0
+# correction = false

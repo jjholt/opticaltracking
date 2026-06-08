@@ -1,4 +1,7 @@
-use std::{collections::HashMap, path::Path};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 use serde::Deserialize;
 
@@ -14,16 +17,40 @@ struct TrackerLabels {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(default)]
+struct ConfigDigitisation {
+    /// Folders to look for digitisation files
+    /// Defaults to `["digit", "calib"]`.
+    folders: Vec<PathBuf>,
+    /// Angle of digitisation
+    /// Defaults to `0.0`
+    angle: f32,
+    /// Whether to apply a correction to kinematics based on the digitisation angle
+    /// Defaults to `false`
+    correction: bool,
+}
+
+impl Default for ConfigDigitisation {
+    fn default() -> Self {
+        Self {
+            folders: vec![PathBuf::from("digit"), PathBuf::from("calib")],
+            angle: 0.0,
+            correction: false,
+        }
+    }
+}
+
+#[derive(Deserialize, Debug)]
 pub struct Config {
     camera_labels: HashMap<Camera, TrackerLabels>,
+    #[serde(default)]
+    digitisation: ConfigDigitisation,
 }
 
 impl Config {
     pub fn from_path(path: &Path) -> crate::Result<Self> {
         let file = std::fs::read_to_string(path)?;
-        let config = toml::from_str(&file)?;
-        println!("{:#?}", config);
-        Ok(config)
+        Ok(toml::from_str(&file)?)
     }
 }
 
@@ -60,7 +87,9 @@ probe = "Probe"
     }
     #[test]
     fn config_from_path() {
-        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data").join("config.toml");
+        let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("data")
+            .join("config.toml");
         let config = Config::from_path(&path).unwrap();
         let polaris = &config.camera_labels[&Camera::Polaris];
         let certus = &config.camera_labels[&Camera::Certus];

@@ -101,6 +101,6 @@ mod test {
     #[test]
     fn splits_headers() {
         let markers = read(INPUT);
-        println!("{:?}", markers);
+        // println!("{:?}", markers);
     }
 }

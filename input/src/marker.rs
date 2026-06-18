@@ -10,6 +10,12 @@ pub struct Marker {
     pub qz: Vec<f32>,
 }
 
+impl Default for Marker {
+    fn default() -> Self {
+        Self { label: Default::default(), tx: Default::default(), ty: Default::default(), tz: Default::default(), q0: Default::default(), qx: Default::default(), qy: Default::default(), qz: Default::default() }
+    }
+}
+
 impl Marker {
     pub fn new(label: String, tx: Vec<f32>, ty: Vec<f32>, tz: Vec<f32>, q0: Vec<f32>, qx: Vec<f32>, qy: Vec<f32>, qz: Vec<f32>) -> Self {
         Self { label, tx, ty, tz, q0, qx, qy, qz }

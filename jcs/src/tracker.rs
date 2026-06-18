@@ -1,9 +1,9 @@
 use input::{Config, Marker};
 
-use crate::RigidBody;
+use crate::{Bone, Landmark, Position};
 
-pub struct Tracker<'a, const N: usize> {
-    rigid_body: &'a RigidBody<N>,
+pub struct Tracker<B: Bone, P: Position> {
+    landmark: Landmark<B, P>,
     label: String,
     tx: Vec<f32>,
     ty: Vec<f32>,
@@ -14,10 +14,10 @@ pub struct Tracker<'a, const N: usize> {
     qz: Vec<f32>,
 }
 
-impl<'a, const N: usize> Tracker<'a, N> {
+impl<B: Bone, P: Position> Tracker<B, P> {
     pub fn new(marker: Marker, config: &Config) -> Self {
         Self {
-            rigid_body: todo!(),
+            landmark: todo!(),
             label: marker.label,
             tx: marker.tx,
             ty: marker.ty,
@@ -28,4 +28,32 @@ impl<'a, const N: usize> Tracker<'a, N> {
             qz: marker.qz,
         }
     }
+
+    pub fn from_marker(marker: Marker, landmark: Landmark<B, P>) -> Tracker<B, P> {
+        Self {
+            landmark,
+            label: marker.label,
+            tx: marker.tx,
+            ty: marker.ty,
+            tz: marker.tz,
+            q0: marker.q0,
+            qx: marker.qx,
+            qy: marker.qy,
+            qz: marker.qz,
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    #[cfg(feature = "knee")]
+    fn creates_objects() {
+        use crate::knee::{Femur};
+
+        let tracker = Tracker::from_marker(Marker::default(), Femur::medial());
+    }
+    
 }

@@ -1,4 +1,4 @@
-use crate::marker::{Marker, MarkerOffsets};
+use common::tracker::{Marker, MarkerOffsets};
 
 pub fn read(input: &str) -> Vec<Marker> {
     let mut lines = input.lines();

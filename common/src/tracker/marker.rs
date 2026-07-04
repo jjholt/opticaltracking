@@ -1,3 +1,6 @@
+use crate::{Bone, Landmark, Position, tracker::Tracker};
+
+
 #[derive(Debug, PartialEq)]
 pub struct Marker {
     pub label: String,
@@ -38,6 +41,9 @@ impl Marker {
     pub fn with_label(mut self, label: &str) -> Self {
         self.label =  label.into();
         self
+    }
+    pub fn assign<B:Bone, P:Position>(self, landmark: Landmark<B,P>) -> Tracker<B,P> {
+        Tracker::from_marker(self, landmark)
     }
 }
 

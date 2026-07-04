@@ -1,14 +1,9 @@
 [package]
-name = "jcs"
+name = "common"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 attitude_determination = { path = "../attitude_determination" }
-input = { path = "../input" }
-common = { path = "../common" }
-
-[features]
-default = ["knee"]
-knee = []
-hip = []
+thiserror = "2.0.18"
+toml = "1.1.2"

@@ -1,4 +1,3 @@
-mod operations;
 mod equality;
 use std::{fmt, marker::PhantomData};
 
@@ -31,6 +30,41 @@ where
             matrix,
         }
     }
+
+    /// Solves Ax = B
+    /// Conceptually equivalent to a invert then multiply.
+    /// gTt.inv_multiply(gTf) := gTt \ gTf == gTt * gTf == tTf
+    pub fn inv_multiply<B: FrameOfReference>(&self, rhs: &Transform<R, B>) -> Transform<A,B> {
+        let lu = na::LU::new(self.matrix.into());
+        let matrix = lu.solve(&rhs.matrix.into()).unwrap();
+        Transform {
+            reference: PhantomData,
+            subject: PhantomData,
+            matrix: na::Affine3::from_matrix_unchecked(matrix),
+        }
+    }
+
+    /// Solves xA = B
+    /// Conceptually equivalent to a division. gTf.divide(tTf) == gTf / tTf == gTt
+    pub fn divide<B: FrameOfReference>(&self, rhs: &Transform<B, A>) -> Transform<R,B> {
+        let m = na::Matrix4::from(self.matrix);
+        let lu = na::LU::new(m.transpose());
+        let matrix = lu.solve(&na::Matrix4::from(rhs.matrix).transpose()).map(|c| c.transpose()).unwrap();
+        Transform {
+            reference: PhantomData,
+            subject: PhantomData,
+            matrix: na::Affine3::from_matrix_unchecked(matrix),
+        }
+    }
+
+    pub fn multiply<B: FrameOfReference>(&self, rhs: &Transform<A, B>) -> Transform<R,B> {
+        Transform {
+            reference: PhantomData,
+            subject: PhantomData,
+            matrix: self.matrix * rhs.matrix,
+        }
+        
+    }
 }
 
 impl<R, A> fmt::Display for Transform<R, A>
@@ -48,7 +82,6 @@ where
 mod test {
 
     use super::*;
-    use crate::operations::Mldivide;
 
     use approx::assert_relative_eq;
 
@@ -69,12 +102,12 @@ mod test {
         let identity = na::Affine3::from_matrix_unchecked(na::Matrix4::identity().into());
         let lhs = Transform::<B, A>::new(identity.clone());
         let rhs = Transform::<B, C>::new(identity.clone());
-        let mldivide: Transform<A, C> = lhs.mldivide(&rhs);
+        let mldivide: Transform<A, C> = lhs.inv_multiply(&rhs);
 
         let lhs = Transform::<A, B>::new(identity.clone());
         let rhs = Transform::<C, B>::new(identity.clone());
 
-        let mrdivide = lhs / rhs;
+        let mrdivide = lhs.divide(&rhs);
 
         assert_relative_eq!(mldivide, mrdivide);
     }
@@ -88,14 +121,14 @@ mod test {
         let m= na::Affine3::from_matrix_unchecked(m.into());
         let rhs = Transform::<B,C>::new(m);
 
-        let mldivide: Transform<A, C> = lhs.mldivide(&rhs);
+        let mldivide: Transform<A, C> = lhs.inv_multiply(&rhs);
 
         let lhs = Transform::<A, B>::new(identity.clone());
         let m = na::Translation3::new(-3.0, -4.0, -5.0);
         let m= na::Affine3::from_matrix_unchecked(m.into());
         let rhs = Transform::<C, B>::new(m.into());
 
-        let mrdivide = lhs / rhs;
+        let mrdivide = lhs.divide(&rhs);
 
         assert_relative_eq!(mldivide, mrdivide);
     }
